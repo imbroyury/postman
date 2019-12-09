@@ -11,6 +11,7 @@ import {
   Grid,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import useKeyValuePairsArray from './useKeyValuePairsArray';
 
 const METHODS = [
   'GET', 'POST', 'PUT',
@@ -42,6 +43,12 @@ const useStyles = makeStyles({
   select: {
     minWidth: '150px',
   },
+  container: {
+    padding: '10px 10px 10px 0',
+  },
+  button: {
+    marginTop: '10px',
+  }
 });
 
 const FORM_INPUTS = {
@@ -50,9 +57,6 @@ const FORM_INPUTS = {
   contentType: 'contentType',
   requestBody: 'requestBody',
 };
-
-const QUERY_PARAM_COUNT = 5;
-const HEADERS_COUNT = 5;
 
 function AddRequest() {
   const classes = useStyles();
@@ -64,11 +68,28 @@ function AddRequest() {
     [FORM_INPUTS.requestBody]: '',
   });
 
+  const [queryParams, editQueryParam, addQueryParam] = useKeyValuePairsArray(1);
+  const [headers, editHeader, addHeader] = useKeyValuePairsArray(1);
+
   const handleSubmit = (event) => {
     if (event) {
       event.preventDefault();
     }
     console.log(inputs);
+    console.log(queryParams);
+    console.log(headers);
+
+    fetch('http://localhost:8280/add-request', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...inputs,
+        queryParams,
+        headers,
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 
   const handleInputChange = (event) => {
@@ -76,29 +97,52 @@ function AddRequest() {
     setInputs(inputs => ({...inputs, [event.target.name]: event.target.value}));
   }
 
+  const handleQueryParamChange = (index, field) => (event) => {
+    event.persist();
+    editQueryParam(index, field, event.target.value);
+  }
+
+  const handleHeaderChange = (index, field) => (event) => {
+    event.persist();
+    editHeader(index, field, event.target.value);
+  } 
+
   const getQueryParamsInputs = () =>
-    new Array(QUERY_PARAM_COUNT)
-          .fill(null)
-          .map((_, i) => (<Grid container item key={i}>
+    queryParams
+          .map((queryParam, i) => (<Grid container item key={i}>
             <TextField
-              placeholder="Key"
-              name={`query-param-key-${i}`}
-              value={inputs[`query-param-key-${i}`] || ''}
-              onChange={handleInputChange}
+              placeholder="key"
+              value={queryParam.key}
+              onChange={handleQueryParamChange(i, 'key')}
             />
             <TextField
-              placeholder="Value"
-              name={`query-param-value-${i}`}
-              value={inputs[`query-param-value-${i}`] || ''}
-              onChange={handleInputChange}
+              placeholder="value"
+              value={queryParam.value}
+              onChange={handleQueryParamChange(i, 'value')}
+            />
+          </Grid>))
+
+  const getHeaderInputs = () =>
+    headers
+          .map((header, i) => (<Grid container item key={i}>
+            <TextField
+              placeholder="key"
+              value={header.key}
+              onChange={handleHeaderChange(i, 'key')}
+            />
+            <TextField
+              placeholder="value"
+              value={header.value}
+              onChange={handleHeaderChange(i, 'value')}
             />
           </Grid>))
 
   return (<Grid container>
     <Paper className={classes.paper}>
-        <Typography variant="h4" gutterBottom>Add new request</Typography>
-        <form noValidate autoComplete="off" onSubmit={handleSubmit}>
-          <Grid container>
+      <Typography variant="h4" gutterBottom>Add new request</Typography>
+      <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+        <Grid container className={classes.container}>
+          <Grid item>
             <TextField 
               label="Request URL"
               name={FORM_INPUTS.requestUrl}
@@ -108,7 +152,9 @@ function AddRequest() {
               required
             />
           </Grid>
-          <Grid container>
+        </Grid>
+        <Grid container className={classes.container}>
+          <Grid item>
             <FormControl>
               <InputLabel>Request Method</InputLabel>
               <Select
@@ -122,12 +168,8 @@ function AddRequest() {
                 }
               </Select>
             </FormControl>
-        </Grid>
-        <Grid container>
-          <Typography>Params</Typography>
-          { getQueryParamsInputs() }
-        </Grid>
-          <Grid container>
+          </Grid>
+          <Grid item>
             <FormControl>
               <InputLabel>Content Type</InputLabel>
               <Select
@@ -144,39 +186,31 @@ function AddRequest() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid container>
-            <TextField
-              label="Request Body"
-              name={FORM_INPUTS.requestBody}
-              value={inputs[FORM_INPUTS.requestBody]}
-              onChange={handleInputChange}
-              multiline
-              rows="4"
-            />
-          </Grid>
-          <Grid container>
-            <Typography>Headers</Typography>
-            {
-              new Array(HEADERS_COUNT)
-                .fill(null)
-                .map((_, i) => (<Grid container item key={i}>
-                  <TextField
-                    placeholder="Key"
-                    name={`headers-key-${i}`}
-                    value={inputs[`headers-key-${i}`] || ''}
-                    onChange={handleInputChange}
-                  />
-                  <TextField
-                    placeholder="Value"
-                    name={`headers-value-${i}`}
-                    value={inputs[`headers-value-${i}`] || ''}
-                    onChange={handleInputChange}
-                  />
-                </Grid>))
-            }
-          </Grid>
-          <Button type="submit" variant="contained" color="primary">Add request</Button>
-        </form>
+        </Grid>
+        <Grid container>
+          <Grid item>
+                <TextField
+                  label="Request Body"
+                  name={FORM_INPUTS.requestBody}
+                  value={inputs[FORM_INPUTS.requestBody]}
+                  onChange={handleInputChange}
+                  multiline
+                  rows="4"
+                />
+            </Grid>
+        </Grid>
+        <Grid container className={classes.container}>
+          <Typography variant="subtitle1">Query params</Typography>
+          { getQueryParamsInputs() }
+          <Button onClick={addQueryParam}  variant="contained" className={classes.button}>Add param</Button>
+        </Grid>
+        <Grid container className={classes.container}>
+          <Typography variant="subtitle1">Headers</Typography>
+          { getHeaderInputs() }
+          <Button onClick={addHeader} variant="contained" className={classes.button}>Add header</Button>
+        </Grid>
+        <Button type="submit" variant="contained" color="primary">Add request</Button>
+      </form>
     </Paper>
   </Grid>);
 }
