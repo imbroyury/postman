@@ -13,12 +13,12 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import useKeyValuePairsArray from '../hooks/useKeyValuePairsArray';
 
-const METHODS = [
+const requestMethods = [
   'GET', 'POST', 'PUT',
   'HEAD','DELETE', 'PATCH', 'OPTIONS',
 ];
 
-const CONTENT_TYPES = [
+const contentTypes = [
   'application/javascript',
   'application/octet-stream',
   'application/ogg',
@@ -62,8 +62,8 @@ function AddRequest() {
   const classes = useStyles();
 
   const [inputs, setInputs] = useState({
-    [FORM_INPUTS.contentType]: CONTENT_TYPES[0],
-    [FORM_INPUTS.requestMethod]: METHODS[0],
+    [FORM_INPUTS.contentType]: contentTypes[0],
+    [FORM_INPUTS.requestMethod]: requestMethods[0],
     [FORM_INPUTS.requestUrl]: '',
     [FORM_INPUTS.requestBody]: '',
   });
@@ -164,7 +164,7 @@ function AddRequest() {
                 className={classes.select}
               >
                 {
-                  METHODS.map(method => <MenuItem key={method} value={method}>{method}</MenuItem>)
+                  requestMethods.map(method => <MenuItem key={method} value={method}>{method}</MenuItem>)
                 }
               </Select>
             </FormControl>
@@ -179,7 +179,7 @@ function AddRequest() {
                 className={classes.select}
               >
                 {
-                  CONTENT_TYPES.map(contentType =>
+                  contentTypes.map(contentType =>
                     <MenuItem key={contentType} value={contentType}>{contentType}</MenuItem>
                   )
                 }
