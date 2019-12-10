@@ -189,14 +189,14 @@ function AddRequest() {
         </Grid>
         <Grid container>
           <Grid item>
-                <TextField
-                  label="Request Body"
-                  name={FORM_INPUTS.requestBody}
-                  value={inputs[FORM_INPUTS.requestBody]}
-                  onChange={handleInputChange}
-                  multiline
-                  rows="4"
-                />
+              <TextField
+                label="Request Body"
+                name={FORM_INPUTS.requestBody}
+                value={inputs[FORM_INPUTS.requestBody]}
+                onChange={handleInputChange}
+                multiline
+                rows="4"
+              />
             </Grid>
         </Grid>
         <Grid container className={classes.container}>
