@@ -14,6 +14,7 @@ function AllRequests() {
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
+    // TODO: Can't perform a React state update on an unmounted component.
     fetch('http://localhost:8280/get-all-requests')
       .then(response => response.json())
       .then(requests => setRequests(requests));
@@ -23,8 +24,12 @@ function AllRequests() {
     <Paper className={classes.paper}>
       {
         requests.map(request =>
-          <Grid container>
-            {Object.entries(request).map(([k, v]) => <Grid item>{k} - {JSON.stringify(v)}</Grid>)}
+          <Grid container key={request._id}>
+            {
+              Object
+                .entries(request)
+                .map(([k, v]) => <Grid item key={k}>{k} - {JSON.stringify(v)}</Grid>)
+            }
           </Grid>)
       }
     </Paper>
