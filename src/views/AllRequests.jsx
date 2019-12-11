@@ -21,7 +21,7 @@ function AllRequests() {
       .then(response => response.json())
       .then(requests => setRequests(requests))
       .catch(e => setError(e));
-  }, [])
+  }, []) // componentDidMount - empty dependecy array
 
   return (<Grid container>
     {error && <Typography variant="h4">Error while fetching requests</Typography>}
