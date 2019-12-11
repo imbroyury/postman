@@ -2,7 +2,7 @@ const fsp = require('fs').promises;
 const path = require('path');
 const uuidv4 = require('uuid/v4');
 
-const REQUESTS_FOLDER = path.resolve(__dirname, 'requests');
+const REQUESTS_FOLDER = path.join(__dirname, 'requests');
 const IGNORE = ['.gitkeep'];
 
 const writeJSON = async (pathToFile, json) => {
@@ -51,7 +51,7 @@ const readAllRequests = async () => {
         (filename) => readJSON(path.join(REQUESTS_FOLDER, filename))
             .catch(() => null) // nullify read errors
     );
-    const result = (await Promise.all(promisedReads)).filter(r => r !==null);
+    const result = (await Promise.all(promisedReads)).filter(r => r !== null);
     return result;
 };
 

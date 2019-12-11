@@ -1,18 +1,23 @@
 const express = require('express');
-const app = express();
+const path = require('path');
+const server = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { writeRequestToFile, readAllRequests } = require('./requestStorage.js');
 const PORT = 8280;
 
-app.use(bodyParser.json());
-app.use(cors());
+server.use(bodyParser.json());
+server.use(cors());
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
+const BUILD_FOLDER = path.join(__dirname, '..', 'build');
+
+server.use(express.static(BUILD_FOLDER));
+
+server.get('/', function (req, res) {
+  res.sendFile(path.join(BUILD_FOLDER, 'index.html'));
 });
 
-app.post('/add-request', async (req, res) => {
+server.post('/add-request', async (req, res) => {
     try {
       await writeRequestToFile(req.body);
       res.send('Request successfully saved');
@@ -21,7 +26,7 @@ app.post('/add-request', async (req, res) => {
     }
 });
 
-app.get('/get-all-requests', async (req, res) => {
+server.get('/get-all-requests', async (req, res) => {
   try {
     const allRequests = await readAllRequests();
     res.send(allRequests);
@@ -30,6 +35,6 @@ app.get('/get-all-requests', async (req, res) => {
   }
 });
 
-app.listen(PORT, function () {
+server.listen(PORT, function () {
   console.log(`Postman listening on port ${PORT}!`);
 });
