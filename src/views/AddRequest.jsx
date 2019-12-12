@@ -52,10 +52,10 @@ const useStyles = makeStyles({
 });
 
 const FORM_INPUTS = {
-  requestUrl: 'requestUrl',
-  requestMethod: 'requestMethod',
+  url: 'url',
+  method: 'method',
   contentType: 'contentType',
-  requestBody: 'requestBody',
+  body: 'body',
 };
 
 function AddRequest() {
@@ -63,9 +63,9 @@ function AddRequest() {
 
   const [inputs, setInputs] = useState({
     [FORM_INPUTS.contentType]: contentTypes[0],
-    [FORM_INPUTS.requestMethod]: requestMethods[0],
-    [FORM_INPUTS.requestUrl]: '',
-    [FORM_INPUTS.requestBody]: '',
+    [FORM_INPUTS.method]: requestMethods[0],
+    [FORM_INPUTS.url]: '',
+    [FORM_INPUTS.body]: '',
   });
 
   const [queryParams, editQueryParam, addQueryParam] = useKeyValuePairsArray(1);
@@ -105,7 +105,7 @@ function AddRequest() {
   const handleHeaderChange = (index, field) => (event) => {
     event.persist();
     editHeader(index, field, event.target.value);
-  } 
+  }
 
   const getQueryParamsInputs = () =>
     queryParams
@@ -143,10 +143,10 @@ function AddRequest() {
       <form noValidate autoComplete="off" onSubmit={handleSubmit}>
         <Grid container className={classes.container}>
           <Grid item>
-            <TextField 
+            <TextField
               label="Request URL"
-              name={FORM_INPUTS.requestUrl}
-              value={inputs[FORM_INPUTS.requestUrl]}
+              name={FORM_INPUTS.url}
+              value={inputs[FORM_INPUTS.url]}
               onChange={handleInputChange}
               type="url"
               required
@@ -158,8 +158,8 @@ function AddRequest() {
             <FormControl>
               <InputLabel>Request Method</InputLabel>
               <Select
-                name={FORM_INPUTS.requestMethod}
-                value={inputs[FORM_INPUTS.requestMethod]}
+                name={FORM_INPUTS.method}
+                value={inputs[FORM_INPUTS.method]}
                 onChange={handleInputChange}
                 className={classes.select}
               >
@@ -191,8 +191,8 @@ function AddRequest() {
           <Grid item>
               <TextField
                 label="Request Body"
-                name={FORM_INPUTS.requestBody}
-                value={inputs[FORM_INPUTS.requestBody]}
+                name={FORM_INPUTS.body}
+                value={inputs[FORM_INPUTS.body]}
                 onChange={handleInputChange}
                 multiline
                 rows="4"

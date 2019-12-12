@@ -40,6 +40,9 @@ server.get('/get-all-requests', async (req, res) => {
 server.get('/run-request', async (req, res) => {
   try {
     const { requestId } = req.query;
+
+    if (!requestId) return res.status(400).send('Invalid request id provided');
+
     const result = await runRequest(requestId);
     res.send(result);
   } catch (e) {
