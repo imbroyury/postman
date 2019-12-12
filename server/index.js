@@ -4,6 +4,8 @@ const server = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { writeRequestToFile, readAllRequests } = require('./requestStorage.js');
+const { runRequest } = require('./requestRunner');
+
 const PORT = 8280;
 
 server.use(bodyParser.json());
@@ -32,6 +34,16 @@ server.get('/get-all-requests', async (req, res) => {
     res.send(allRequests);
   } catch(e) {
     res.status(500).send('Unable to read all requests');
+  }
+});
+
+server.get('/run-request', async (req, res) => {
+  try {
+    const { requestId } = req.query;
+    const result = await runRequest(requestId);
+    res.send(result);
+  } catch (e) {
+    res.status(500).send('Failed to run request');
   }
 });
 
