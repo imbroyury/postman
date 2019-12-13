@@ -13,10 +13,7 @@ const BUILD_FOLDER = path.join(__dirname, '..', 'build');
 
 server.use(express.static(BUILD_FOLDER));
 
-server.get('/', function (req, res) {
-  res.sendFile(path.join(BUILD_FOLDER, 'index.html'));
-});
-
+// API
 server.post('/add-request', async (req, res) => {
     try {
       await writeRequestToFile(req.body);
@@ -46,6 +43,11 @@ server.get('/run-request', async (req, res) => {
   } catch (e) {
     res.status(500).send('Failed to run request');
   }
+});
+
+// For everything else, server index file
+server.get('*', function (req, res) {
+  res.sendFile(path.join(BUILD_FOLDER, 'index.html'));
 });
 
 server.listen(PORT, function () {
