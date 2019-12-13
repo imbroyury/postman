@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const server = express();
-const cors = require('cors');
 const bodyParser = require('body-parser');
 const { writeRequestToFile, readAllRequests } = require('./requestStorage.js');
 const { runRequest } = require('./requestRunner');
@@ -9,7 +8,6 @@ const { runRequest } = require('./requestRunner');
 const PORT = 8280;
 
 server.use(bodyParser.json());
-server.use(cors());
 
 const BUILD_FOLDER = path.join(__dirname, '..', 'build');
 
