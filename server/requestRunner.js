@@ -46,6 +46,7 @@ const runRequest = async (id) => {
     // по возможности — превью тела ответа.
     } catch (e) {
         console.log('Error while running request');
+        console.log(e);
         throw e;
     }
 };

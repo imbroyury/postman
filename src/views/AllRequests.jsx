@@ -9,7 +9,12 @@ import {
   Typography,
   ExpansionPanel,
   ExpansionPanelSummary,
-  ExpansionPanelDetails
+  ExpansionPanelDetails,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { makeStyles } from '@material-ui/core/styles';
@@ -21,6 +26,9 @@ const useStyles = makeStyles({
   method: {
     marginRight: '20px',
   },
+  requestPanel: {
+    width: 'calc(100vw - 230px)',
+  },
   requestResult: {
     border: '1px solid rgba(95, 69, 120, 0.1)',
     borderRadius: '3px',
@@ -28,6 +36,15 @@ const useStyles = makeStyles({
     padding: '30px',
     overflow: 'auto',
     marginTop: '20px',
+  },
+  runButton: {
+    margin: '20px 0',
+  },
+  table: {
+    width: '400px',
+  },
+  tableCell: { 
+    width: '50%',
   }
 });
 
@@ -91,6 +108,10 @@ const AllRequests = () => {
       <CircularProgress />
     </Grid>);
 
+    if (status === STATUSES.error) return (<Grid container>
+      <Typography>An error occured while running your request</Typography>
+    </Grid>);
+
     return (<Grid container>
       <code className={classes.requestResult}>
         <div>Status: {result.status}</div><br></br>
@@ -102,30 +123,59 @@ const AllRequests = () => {
 
   const renderError = () => (<Paper className={classes.paper}>
     <Typography variant="h4">Error while fetching requests</Typography>
-  </Paper>)
+  </Paper>);
 
   const renderNoRequests = () => (<Paper className={classes.paper}>
     <Typography variant="h4">No requests fetched</Typography>
-  </Paper>)
+  </Paper>);
 
-  const renderRequest = (request) => (<ExpansionPanel key={request._id}>
+  const renderKeyValueTable = (list) => (<Table size="small" className={classes.table}>
+    <TableHead>
+      <TableRow>
+        <TableCell className={classes.tableCell}>Key</TableCell>
+        <TableCell className={classes.tableCell}>Value</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {list.map(({ key, value }) => (
+        <TableRow key={key}>
+          <TableCell align="left"><code>{key}</code></TableCell>
+          <TableCell align="left"><code>{value}</code></TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>)
+
+  const renderRequest = (request) => (<ExpansionPanel key={request._id} className={classes.requestPanel}>
     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
       <Grid container alignItems="center">
         <Chip label={request.method} color="primary" className={classes.method} />
-        <Typography variant="subtitle2"> {request.url}</Typography>
+        <Typography variant="subtitle2">{request.url}</Typography>
       </Grid>
     </ExpansionPanelSummary>
     <ExpansionPanelDetails>
       <Grid container>
-        <Grid item container><Typography variant="body2">Content-Type: {request.contentType}</Typography></Grid>
-        <Grid item container><Typography variant="body2">Body: {request.body}</Typography></Grid>
-        <Grid item container><Typography variant="body2">Query parameters: {JSON.stringify(request.queryParams)}</Typography></Grid>
-        <Grid item container><Typography variant="body2">Headers: {JSON.stringify(request.headers)}</Typography></Grid>
+        <Grid item container>
+          <Typography variant="body1">Content-Type: {request.contentType}</Typography>
+        </Grid>
+        <Grid item container>
+          <Typography variant="body1">Body:</Typography>
+          <Grid container><code>{request.body}</code></Grid>
+        </Grid>
+        <Grid item container>
+          <Typography variant="body1">Query parameters:</Typography>
+          <Grid container>{renderKeyValueTable(request.queryParams)}</Grid>
+        </Grid>
+        <Grid item container>
+          <Typography variant="body1">Headers:</Typography>
+          <Grid container>{renderKeyValueTable(request.headers)}</Grid>
+        </Grid>
         <Button
           variant="outlined"
           color="primary"
           onClick={() => runRequest(request._id)}
           disabled={requestStates[request._id].status === STATUSES.running}
+          className={classes.runButton}
         >
           Run
         </Button>
@@ -136,7 +186,7 @@ const AllRequests = () => {
 
   return (<Grid container>
     {error && renderError()}
-    {requests.length === 0 && renderNoRequests()}
+    {(requests.length === 0 && !error) && renderNoRequests()}
     {requests.map(renderRequest)}
   </Grid>);
 }

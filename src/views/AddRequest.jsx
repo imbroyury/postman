@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from "react-router-dom";
 import {
   Button,
   TextField,
@@ -13,29 +14,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import useKeyValuePairsArray from '../hooks/useKeyValuePairsArray';
 import axios from 'axios';
-
-const requestMethods = [
-  'GET', 'POST', 'PUT',
-  'HEAD','DELETE', 'PATCH', 'OPTIONS',
-];
-
-const contentTypes = [
-  'application/javascript',
-  'application/octet-stream',
-  'application/ogg',
-  'application/pdf',
-  'application/xhtml+xml',
-  'application/json',
-  'application/xml',
-  'application/zip',
-  'application/x-www-form-urlencoded',
-  'text/css',
-  'text/csv',
-  'text/html',
-  'text/plain',
-  'text/xml',
-  'multipart/form-data'
-];
+import { contentTypes } from '../data/contentTypes';
+import { requestMethods } from '../data/requestMethods';
 
 const useStyles = makeStyles({
   paper: {
@@ -71,17 +51,20 @@ function AddRequest() {
 
   const [queryParams, editQueryParam, addQueryParam] = useKeyValuePairsArray(1);
   const [headers, editHeader, addHeader] = useKeyValuePairsArray(1);
+  const history = useHistory();
 
   const handleSubmit = (event) => {
     if (event) {
       event.preventDefault();
     }
 
-    axios.post('/add-request', {
+    axios
+      .post('/add-request', {
         ...inputs,
         queryParams,
         headers,
-      });
+      })
+      .then(() => history.push('/all-requests'));
   }
 
   const handleInputChange = (event) => {

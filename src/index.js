@@ -18,6 +18,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 const drawerWidth = 180;
+
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: drawerWidth,
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   },
   view: {
     marginLeft: drawerWidth,
-  }
+  },
 }));
 
 const routes = [
