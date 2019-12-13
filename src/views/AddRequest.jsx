@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import useKeyValuePairsArray from '../hooks/useKeyValuePairsArray';
+import axios from 'axios';
 
 const requestMethods = [
   'GET', 'POST', 'PUT',
@@ -75,21 +76,12 @@ function AddRequest() {
     if (event) {
       event.preventDefault();
     }
-    console.log(inputs);
-    console.log(queryParams);
-    console.log(headers);
 
-    fetch('http://localhost:8280/add-request', {
-      method: 'POST',
-      body: JSON.stringify({
+    axios.post('/add-request', {
         ...inputs,
         queryParams,
         headers,
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+      });
   }
 
   const handleInputChange = (event) => {

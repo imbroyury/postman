@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Button,
   Chip,
@@ -21,10 +22,12 @@ const useStyles = makeStyles({
     marginRight: '20px',
   },
   requestResult: {
-    boxShadow: 'inset 0 0 5px #000000',
+    border: '1px solid rgba(95, 69, 120, 0.1)',
+    borderRadius: '3px',
     maxHeight: '300px',
     padding: '30px',
     overflow: 'auto',
+    marginTop: '20px',
   }
 });
 
@@ -49,9 +52,8 @@ const AllRequests = () => {
     );
 
   useEffect(() => {
-    fetch('http://localhost:8280/get-all-requests')
-      .then(response => response.json())
-      .then(requests => {
+    axios.get('/get-all-requests')
+      .then(({ data: requests }) => {
         initRequestStates(requests);
         setRequests(requests);
       })
@@ -75,9 +77,8 @@ const AllRequests = () => {
       }
     }));
 
-    fetch(`http://localhost:8280/run-request?requestId=${requestId}`)
-      .then(response => response.json())
-      .then(result => setRequestState(requestId, STATUSES.done, result))
+    axios.get(`/run-request?requestId=${requestId}`)
+      .then(({ data: result }) => setRequestState(requestId, STATUSES.done, result))
       .catch(e => setRequestState(requestId, STATUSES.error, e));
   };
 
@@ -91,7 +92,11 @@ const AllRequests = () => {
     </Grid>);
 
     return (<Grid container>
-      <code className={classes.requestResult}>{JSON.stringify(result)}</code>
+      <code className={classes.requestResult}>
+        <div>Status: {result.status}</div><br></br>
+        <div>Headers: {JSON.stringify(result.headers)}</div><br></br>
+        <div>{JSON.stringify(result.body)}</div>
+      </code>
     </Grid>)
   }
 
