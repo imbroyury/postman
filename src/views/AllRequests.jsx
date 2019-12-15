@@ -102,8 +102,8 @@ const AllRequests = () => {
       <TableBody>
         {
           Object.entries(headers).map(([key, value]) => (<TableRow key={key}>
-              <TableCell align="left">{key}</TableCell>
-              <TableCell align="left">{value}</TableCell>
+              <TableCell align="left"><code>{key}</code></TableCell>
+              <TableCell align="left"><code>{value}</code></TableCell>
             </TableRow>))
         }
       </TableBody>

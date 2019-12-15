@@ -4,7 +4,6 @@ import AddRequest from './views/AddRequest.jsx';
 import AllRequests from './views/AllRequests.jsx';
 import {
   BrowserRouter as Router,
-  Redirect,
   Switch,
   Route,
   Link,
@@ -75,7 +74,6 @@ const Root = () => {
         }
       </Switch>
     </main>
-    <Redirect to="/all-requests" />
   </Router>)
 }
 
