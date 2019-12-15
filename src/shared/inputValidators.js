@@ -9,7 +9,7 @@ const isKeyValueObject = input => typeof input === 'object' &&
 
 export const inputValidators = {
   [formInputs.url]: (value) => isString(value) &&
-    new RegExp(/^((?:http:\/\/)|(?:https:\/\/))(www.)?((?:[a-zA-Z0-9]+\.[a-z]{2,3})|(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?))([\/a-zA-Z0-9\.]*)$/) // eslint-disable-line no-useless-escape
+    new RegExp(/^((?:http:\/\/)|(?:https:\/\/))(www.)?((?:[a-zA-Z0-9-]+\.[a-z]{2,3})|(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?))([\/a-zA-Z0-9\.]*)$/) // eslint-disable-line no-useless-escape
       .test(value),
   [formInputs.contentType]: (value) => contentTypes.includes(value),
   [formInputs.method]: (value) => requestMethods.includes(value),
