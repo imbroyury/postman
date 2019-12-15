@@ -1,9 +1,10 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import { writeRequestToFile, readAllRequests } from './requestStorage.js';
+import { runRequest } from './requestRunner';
+import { getIsRequestFormValid } from './formValidation.js';
 const server = express();
-const bodyParser = require('body-parser');
-const { writeRequestToFile, readAllRequests } = require('./requestStorage.js');
-const { runRequest } = require('./requestRunner');
 
 const PORT = 8280;
 
@@ -16,7 +17,12 @@ server.use(express.static(BUILD_FOLDER));
 // API
 server.post('/add-request', async (req, res) => {
     try {
-      await writeRequestToFile(req.body);
+      const { body: form } = req;
+      const isFormValid = getIsRequestFormValid(form);
+      if (!isFormValid) {
+        return res.status(400).send('Invalid form');
+      }
+      await writeRequestToFile(form);
       res.send('Request successfully saved');
     } catch(e) {
       res.status(500).send('Unable to save request');

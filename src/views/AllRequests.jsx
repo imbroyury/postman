@@ -11,7 +11,6 @@ import {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
   Table,
-  TableHead,
   TableRow,
   TableCell,
   TableBody,
@@ -29,13 +28,12 @@ const useStyles = makeStyles({
   requestPanel: {
     width: 'calc(100vw - 230px)',
   },
-  requestResult: {
+  requestBody: {
     border: '1px solid rgba(95, 69, 120, 0.1)',
     borderRadius: '3px',
     maxHeight: '300px',
-    padding: '30px',
+    padding: '20px',
     overflow: 'auto',
-    marginTop: '20px',
   },
   runButton: {
     margin: '20px 0',
@@ -43,7 +41,7 @@ const useStyles = makeStyles({
   table: {
     width: '400px',
   },
-  tableCell: { 
+  tableCell: {
     width: '50%',
   }
 });
@@ -99,6 +97,19 @@ const AllRequests = () => {
       .catch(e => setRequestState(requestId, STATUSES.error, e));
   };
 
+  const renderResponseHeaders = (headers) => {
+    return (<Table size="small">
+      <TableBody>
+        {
+          Object.entries(headers).map(([key, value]) => (<TableRow key={key}>
+              <TableCell align="left">{key}</TableCell>
+              <TableCell align="left">{value}</TableCell>
+            </TableRow>))
+        }
+      </TableBody>
+    </Table>)
+  }
+
   const renderRequestState = (requestId) => {
     const { status, result } = requestStates[requestId];
 
@@ -112,13 +123,33 @@ const AllRequests = () => {
       <Typography>An error occured while running your request</Typography>
     </Grid>);
 
-    return (<Grid container>
-      <code className={classes.requestResult}>
-        <div>Status: {result.status}</div><br></br>
-        <div>Headers: {JSON.stringify(result.headers)}</div><br></br>
-        <div>{JSON.stringify(result.body)}</div>
-      </code>
-    </Grid>)
+    return (
+      <Grid container>
+        <Grid container>
+          <Typography variant="subtitle2" gutterBottom>Response: </Typography>
+        </Grid>
+        <Grid container>
+          <Grid container>
+            <Typography variant="body2" gutterBottom>Status: {result.status}</Typography>
+          </Grid>
+          <Grid container>
+            <Typography variant="body2" gutterBottom>Content-Type: {result.contentType}</Typography>
+          </Grid>
+          <Grid container>
+            <Typography variant="body2" gutterBottom>Headers:</Typography>
+            { renderResponseHeaders(result.headers) }
+          </Grid>
+          <Grid container>
+            <Grid container>
+              <Typography variant="body2" gutterBottom>Body: </Typography>
+            </Grid>
+            <code className={classes.requestBody}>
+              {JSON.stringify(result.body)}
+            </code>
+          </Grid>
+        </Grid>
+      </Grid>
+    )
   }
 
   const renderError = () => (<Paper className={classes.paper}>
@@ -130,12 +161,6 @@ const AllRequests = () => {
   </Paper>);
 
   const renderKeyValueTable = (list) => (<Table size="small" className={classes.table}>
-    <TableHead>
-      <TableRow>
-        <TableCell className={classes.tableCell}>Key</TableCell>
-        <TableCell className={classes.tableCell}>Value</TableCell>
-      </TableRow>
-    </TableHead>
     <TableBody>
       {list.map(({ key, value }) => (
         <TableRow key={key}>
@@ -156,30 +181,34 @@ const AllRequests = () => {
     <ExpansionPanelDetails>
       <Grid container>
         <Grid item container>
-          <Typography variant="body1">Content-Type: {request.contentType}</Typography>
+          <Typography variant="subtitle2" gutterBottom>Request: </Typography>
         </Grid>
         <Grid item container>
-          <Typography variant="body1">Body:</Typography>
-          <Grid container><code>{request.body}</code></Grid>
+          <Grid item container>
+            <Typography variant="body2" gutterBottom>Content-Type: {request.contentType}</Typography>
+          </Grid>
+          <Grid item container>
+            <Typography variant="body2" gutterBottom>Body: <code>{request.body}</code></Typography>
+          </Grid>
+          <Grid item container>
+            <Typography variant="body2" gutterBottom>Query parameters:</Typography>
+            <Grid container>{renderKeyValueTable(request.queryParams)}</Grid>
+          </Grid>
+          <Grid item container>
+            <Typography variant="body2" gutterBottom>Headers:</Typography>
+            <Grid container>{renderKeyValueTable(request.headers)}</Grid>
+          </Grid>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => runRequest(request._id)}
+            disabled={requestStates[request._id].status === STATUSES.running}
+            className={classes.runButton}
+          >
+            Run
+          </Button>
+          { renderRequestState(request._id) }
         </Grid>
-        <Grid item container>
-          <Typography variant="body1">Query parameters:</Typography>
-          <Grid container>{renderKeyValueTable(request.queryParams)}</Grid>
-        </Grid>
-        <Grid item container>
-          <Typography variant="body1">Headers:</Typography>
-          <Grid container>{renderKeyValueTable(request.headers)}</Grid>
-        </Grid>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => runRequest(request._id)}
-          disabled={requestStates[request._id].status === STATUSES.running}
-          className={classes.runButton}
-        >
-          Run
-        </Button>
-        { renderRequestState(request._id) }
       </Grid>
     </ExpansionPanelDetails>
   </ExpansionPanel>)

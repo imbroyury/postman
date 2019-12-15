@@ -1,6 +1,6 @@
-const fsp = require('fs').promises;
-const path = require('path');
-const uuidv4 = require('uuid/v4');
+import { promises as fsp } from 'fs';
+import path from 'path';
+import uuidv4 from 'uuid/v4';
 
 const REQUESTS_FOLDER = path.join(__dirname, 'requests');
 const IGNORE = ['.gitkeep'];
@@ -24,7 +24,7 @@ const readJSON = async (pathToFile) => {
     }
 };
 
-const writeRequestToFile = async (request) => {
+export const writeRequestToFile = async (request) => {
     const uuid = uuidv4();
     const req = {
         _id: uuid,
@@ -37,14 +37,14 @@ const writeRequestToFile = async (request) => {
     return uuid;
 };
 
-const readRequest = async (requestId) => {
+export const readRequest = async (requestId) => {
     const filename = `${requestId}.json`;
     const pathToFile = path.join(REQUESTS_FOLDER, filename);
     const contents = await readJSON(pathToFile);
     return contents;
 };
 
-const readAllRequests = async () => {
+export const readAllRequests = async () => {
     const list = await fsp.readdir(REQUESTS_FOLDER);
     const toRead = list.filter(item => !IGNORE.includes(item));
     const promisedReads = toRead.map(
@@ -54,9 +54,3 @@ const readAllRequests = async () => {
     const result = (await Promise.all(promisedReads)).filter(r => r !== null);
     return result;
 };
-
-module.exports = {
-    writeRequestToFile,
-    readRequest,
-    readAllRequests,
-}

@@ -14,8 +14,10 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import useKeyValuePairsArray from '../hooks/useKeyValuePairsArray';
 import axios from 'axios';
-import { contentTypes } from '../data/contentTypes';
-import { requestMethods } from '../data/requestMethods';
+import { contentTypes } from '../shared/contentTypes';
+import { requestMethods } from '../shared/requestMethods';
+import { formInputs } from '../shared/formInputs';
+import { inputValidators } from '../shared/inputValidators';
 
 const useStyles = makeStyles({
   paper: {
@@ -32,22 +34,19 @@ const useStyles = makeStyles({
   }
 });
 
-const FORM_INPUTS = {
-  url: 'url',
-  method: 'method',
-  contentType: 'contentType',
-  body: 'body',
-};
-
 function AddRequest() {
   const classes = useStyles();
 
   const [inputs, setInputs] = useState({
-    [FORM_INPUTS.contentType]: contentTypes[0],
-    [FORM_INPUTS.method]: requestMethods[0],
-    [FORM_INPUTS.url]: '',
-    [FORM_INPUTS.body]: '',
+    [formInputs.contentType]: contentTypes[0],
+    [formInputs.method]: requestMethods[0],
+    [formInputs.url]: '',
+    [formInputs.body]: '',
   });
+
+  const [inputErrors, setInputErrors] = useState({
+    [formInputs.url]: false,
+  })
 
   const [queryParams, editQueryParam, addQueryParam] = useKeyValuePairsArray(1);
   const [headers, editHeader, addHeader] = useKeyValuePairsArray(1);
@@ -67,9 +66,18 @@ function AddRequest() {
       .then(() => history.push('/all-requests'));
   }
 
+  const setInputError = (name, value) => {
+    const validator = inputValidators[name];
+    if (typeof validator === 'function') {
+      setInputErrors(errors => ({...errors, [name]: !validator(value)}));
+    }
+  }
+
   const handleInputChange = (event) => {
     event.persist();
-    setInputs(inputs => ({...inputs, [event.target.name]: event.target.value}));
+    const { name, value } = event.target;
+    setInputs(inputs => ({...inputs, [name]: value}));
+    setInputError(name, value);
   }
 
   const handleQueryParamChange = (index, field) => (event) => {
@@ -120,11 +128,13 @@ function AddRequest() {
           <Grid item>
             <TextField
               label="Request URL"
-              name={FORM_INPUTS.url}
-              value={inputs[FORM_INPUTS.url]}
+              name={formInputs.url}
+              value={inputs[formInputs.url]}
               onChange={handleInputChange}
               type="url"
               required
+              error={inputErrors[formInputs.url]}
+              helperText="Please enter a valid URL with no query params"
             />
           </Grid>
         </Grid>
@@ -133,8 +143,8 @@ function AddRequest() {
             <FormControl>
               <InputLabel>Request Method</InputLabel>
               <Select
-                name={FORM_INPUTS.method}
-                value={inputs[FORM_INPUTS.method]}
+                name={formInputs.method}
+                value={inputs[formInputs.method]}
                 onChange={handleInputChange}
                 className={classes.select}
               >
@@ -148,8 +158,8 @@ function AddRequest() {
             <FormControl>
               <InputLabel>Content Type</InputLabel>
               <Select
-                name={FORM_INPUTS.contentType}
-                value={inputs[FORM_INPUTS.contentType]}
+                name={formInputs.contentType}
+                value={inputs[formInputs.contentType]}
                 onChange={handleInputChange}
                 className={classes.select}
               >
@@ -166,8 +176,8 @@ function AddRequest() {
           <Grid item>
               <TextField
                 label="Request Body"
-                name={FORM_INPUTS.body}
-                value={inputs[FORM_INPUTS.body]}
+                name={formInputs.body}
+                value={inputs[formInputs.body]}
                 onChange={handleInputChange}
                 multiline
                 rows="4"
@@ -177,7 +187,7 @@ function AddRequest() {
         <Grid container className={classes.container}>
           <Typography variant="subtitle1">Query params</Typography>
           { getQueryParamsInputs() }
-          <Button onClick={addQueryParam}  variant="contained" className={classes.button}>Add param</Button>
+          <Button onClick={addQueryParam} variant="contained" className={classes.button}>Add param</Button>
         </Grid>
         <Grid container className={classes.container}>
           <Typography variant="subtitle1">Headers</Typography>
