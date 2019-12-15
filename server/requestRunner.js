@@ -5,8 +5,10 @@ const isNonEmptyString = (input) => typeof input === 'string' && input.length > 
 
 const getQueryParamsString = queryParams => queryParams
     .filter(({ key, value }) => [key, value].every(isNonEmptyString))
-    .map(({ key, value }) => `${key}=${value}`)
-    .join('&');
+    .reduce((searchParams, { key, value }) => {
+        searchParams.append(key, value);
+        return searchParams;
+    }, new URLSearchParams());
 
 const getHeadersStore = headers => headers
     .filter(({ key, value }) => [key, value].every(isNonEmptyString))
@@ -16,11 +18,12 @@ const runRequest = async (id) => {
     try {
         const request = await readRequest(id);
 
-        const url = `${request.url}?${getQueryParamsString(request.queryParams)}`;
+        const url = new URL(request.url);
+        url.search = getQueryParamsString(request.queryParams);
         const restHeaders = getHeadersStore(request.headers);
 
         const config = {
-            url,
+            url: url.toString(),
             method: request.method,
             headers: {
                 'Content-Type': request.contentType,
